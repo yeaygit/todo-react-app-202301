@@ -1,0 +1,6 @@
+.todo-list{
+    padding: 20px 32px 48px;
+    
+    max-height: 500px;
+    overflow-y: auto;
+}

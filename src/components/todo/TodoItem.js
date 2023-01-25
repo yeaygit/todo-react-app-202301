@@ -5,8 +5,13 @@ import './css/TodoItem.css';
 import cn from 'classnames';
 
 
-const TodoItem = ({todo}) => {
-  const {title,done}=todo;
+const TodoItem = ({todo,remove}) => {
+  const {id,title,done}=todo;
+
+  //서버에 삭제요청 클릭 이벤트핸들러
+  const deleteClickHandler=e=>{
+    remove(id);
+  };
 
   return (
     <li className='todo-item'>
@@ -14,7 +19,7 @@ const TodoItem = ({todo}) => {
             {done&&<MdDone />}
         </div>
         <span className={cn('text',{finish:done})}>{title}</span>
-        <div className='remove'>
+        <div className='remove' onClick={deleteClickHandler}>
             <MdDelete />
         </div>
     </li>

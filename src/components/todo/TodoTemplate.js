@@ -27,6 +27,18 @@ const TodoTemplate = () => {
         
     };
 
+    //할일 삭제 서버 요청
+    const deleteTodo=(id)=>{
+        fetch(`${API_BASE_URL}/${id}`,{
+            method: 'DELETE',
+            
+        })
+        .then(res=>res.json())
+        .then(result=>{
+            setTodos(result.todos);
+        });
+    };
+
 
 
 
@@ -44,7 +56,7 @@ const TodoTemplate = () => {
   return (
     <div className='todo-template'>
         <TodoHeader todoList={todos}/>
-        <TodoMain todoList={todos}/>
+        <TodoMain todoList={todos} remove={deleteTodo}/>
         <TodoInput add={addTodo}/>
     </div>
   )

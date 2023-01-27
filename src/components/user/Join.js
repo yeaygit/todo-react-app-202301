@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {Button, Container, Grid,
      TextField, Typography, Link} from "@mui/material";
 
-import { BASE_URL,USER } from '../../config/host-config';
+import { BASE_URL, USER } from '../../config/host-config';
 
 const Join = () => {
 
@@ -11,15 +11,26 @@ const Join = () => {
    const [message, setMessage] = useState({
       username: '',
       password: '',
-      email: ''
+      email: '',
+      check:''
    });  
 
    // 검증 완료 여부
    const [validate, setValidate] = useState({
       username: false,
       password: false,
-      email: false
+      email: false,
+      check:false
    });
+
+   //입력값 저장
+   const [userValue,setUserValue]=useState({
+    userName:'',
+    email:'',
+    password:''
+   });
+
+
 
   // 유저 이름 입력란 검증 체인지 이벤트 핸들러
   const nameHandler = e => {
@@ -52,6 +63,11 @@ const Join = () => {
         ...message,
         username: msg
     });
+
+    setUserValue({
+        ...userValue,
+        userName:e.target.value
+    })
   };
 
   //이메일 중복 확인 요청 함수
@@ -77,6 +93,7 @@ const Join = () => {
             ...message,
             email:msg
         })
+        
     });
   };
 
@@ -95,10 +112,22 @@ const Join = () => {
         checkEmail(e.target.value);
     }
     setMessage({...message, email: msg});
+    setUserValue({
+        ...userValue,
+        email:e.target.value
+    })
 };
 
   // 비밀번호 입력란 검증 체인지 이벤트 핸들러
   const passwordHandler = e => {
+
+    //패스워드 확인란을 비워버리기
+    document.getElementById('re-password').value='';
+    document.getElementById('check-text').textContent='';
+    setValidate({
+        ...validate,
+        check:false
+    });
 
     const pwRegex =  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,20}$/;
 
@@ -127,12 +156,91 @@ const Join = () => {
         ...message,
         password: msg
     });
+    setUserValue({
+        ...userValue,
+        password:e.target.value
+    })
+  };
+
+
+  //비밀번호 재확인
+  const checkPassword=e=>{
+
+    let msg;
+    if (!e.target.value) { // 패스워드 안적은거
+        msg = '비밀번호 확인란은 필수값입니다!';
+        setValidate({
+            ...validate,
+            check: false
+        });
+    } else if(e.target.value!==userValue.password){
+        msg='비밀번호를 다시 확인해주세요.';
+        setValidate({
+            ...validate,
+            check:false
+        });
+        
+    }else{
+        msg='비밀번호가 일치합니다.';
+        
+        setValidate({
+            ...validate,
+            check:true
+        });
+    }
+    setMessage({
+        ...message,
+        check:msg
+    });
+
+  }
+
+
+
+
+  //validate 객체 안의 모든 논리값이 true인지 검사하는 함수
+  const isValid=()=>{
+    // of : 배열 반복, in : 객체 반복
+    // 객체에서 key값만 뽑아줌
+    for (let key in validate){ //key값이 문자열일 경우
+        let value= validate[key];
+        if(!value) return false;
+    }
+    return true;
+  };
+
+  //회원가입 요청 서버로 보내기
+  const submitHandler=e=>{
+    e.preventDefault();
+
+    //입력값 검증을 올바르게 수행했는지 검사
+    if(isValid()){
+        // alert('회원가입 이제 보낼게');
+        fetch(`${API_BASE_URL}/signup`,{
+            method:'POST',
+            headers:{
+                'content-type':'application/json'
+            },
+            body:JSON.stringify(userValue)
+        })
+        .then(res=>{
+            if(res.status===200){
+                alert('회원가입을 축하합니다.');
+                //로그인페이지로 리다이렉트
+                window.location.href='/login';
+            }else{
+                alert('회원가입에 실패했습니다. 잠시 후 다시 도전하세요.')
+            }
+        });
+    }else{
+        alert('입력창 다시 확인해!')
+    }
   };
 
 
   return (
     <Container component="main" maxWidth="xs" style={{ margin: "300px auto" }}>
-        <form noValidate>
+        <form noValidate onSubmit={submitHandler}>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     <Typography component="h1" variant="h5">
@@ -191,6 +299,24 @@ const Join = () => {
                         ? {color: 'green'}
                         : {color: 'red'}
                     }>{message.password}</span>
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        variant="outlined"
+                        required
+                        fullWidth
+                        name="re-password"
+                        label="패스워드를 다시 한 번 입력하세요."
+                        type="password"
+                        id="re-password"
+                        autoComplete="check-password"
+                        onChange={checkPassword}
+                    />
+                    <span id='check-text' style={
+                        validate.check
+                        ? {color: 'green'}
+                        : {color: 'red'}
+                    }>{message.check}</span>
                 </Grid>
                 <Grid item xs={12}>
                     <Button type="submit" fullWidth variant="contained" color="primary">

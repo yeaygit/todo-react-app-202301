@@ -3,6 +3,7 @@ import React, { useState,useEffect } from 'react'
 import { Spinner } from 'reactstrap';
 import { BASE_URL,TODO } from '../../config/host-config';
 
+
 //css로딩
 import './css/TodoTemplate.css';
 import TodoHeader from './TodoHeader';
@@ -68,6 +69,11 @@ const TodoTemplate = () => {
             .then(res=>{
                 if(res.status===403){
                 alert("로그인이 필요한 서비스입니다!");
+
+                //리다이렉트
+                window.location.href='/loin;'
+
+
 
                 //리다이렉트
                  return;

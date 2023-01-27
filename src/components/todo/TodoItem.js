@@ -1,17 +1,21 @@
 import classNames from 'classnames';
 import React,{useState} from 'react';
-import {MdDone,MdDelete} from 'react-icons/md';
+import {MdDone,MdDelete,MdEdit} from 'react-icons/md';
 import './css/TodoItem.css';
 import cn from 'classnames';
 
 
-const TodoItem = ({todo,remove,update}) => {
+const TodoItem = ({todo,remove,update,modify}) => {
   const {id,title,done}=todo;
   
   
   //서버에 삭제요청 클릭 이벤트핸들러
   const deleteClickHandler=e=>{
     remove(id);
+  };
+
+  const modifyClickHandler=e=>{
+    modify(id);
   };
 
   //할일 완료 수정처리 이벤트 핸들러
@@ -36,6 +40,9 @@ const TodoItem = ({todo,remove,update}) => {
             {done&&<MdDone />}
         </div>
         <span className={cn('text',{finish:done})}>{title}</span>
+        <div className='modify' onClick={modifyClickHandler}>
+          <MdEdit />
+        </div>
         <div className='remove' onClick={deleteClickHandler}>
             <MdDelete />
         </div>
